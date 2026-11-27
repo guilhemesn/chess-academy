@@ -1,5 +1,5 @@
-const CACHE = 'chess-academy-v4';
-const assets = ['./','./index.html','./app.js?v=4','./study.js?v=4','./manifest.json','./icon-192.png','./icon-512.png','https://cdn.jsdelivr.net/npm/chess.js@1.4.0/+esm'];
+const CACHE = 'chess-academy-v5';
+const assets = ['./','./index.html','./app.js?v=5','./missions.js?v=5','./study.js?v=4','./manifest.json','./icon-192.png','./icon-512.png','https://cdn.jsdelivr.net/npm/chess.js@1.4.0/+esm'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(assets)).then(() => self.skipWaiting()));
 });

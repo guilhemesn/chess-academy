@@ -1,4 +1,5 @@
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1.4.0/+esm';
+import { setupMissions } from './missions.js?v=5';
 import { lessons, games, tactics, notes } from './study.js?v=4';
 
 const $ = id => document.getElementById(id);
@@ -10,7 +11,7 @@ const parse = code => ({from:code.slice(0,2),to:code.slice(2,4),promotion:code[4
 const label = m => m ? m.san : '';
 const center = ['d4','e4','d5','e5'];
 const openingHome = ['b1','g1','c1','f1','b8','g8','c8','f8'];
-const modes = [['Aulas','◈'],['Táticas','✦'],['Jogar','♞'],['Partidas','▤'],['Progresso','◉']];
+const modes = [['Missões','★'],['Aulas','◈'],['Táticas','✦'],['Jogar','♞'],['Partidas','▤'],['Progresso','◉']];
 let progress = {done:[],xp:0,errors:{}};
 try {
   const current = JSON.parse(localStorage.getItem('academy-v4'));
@@ -192,6 +193,7 @@ function applyMove(move) {
 }
 
 function seek(next) {
+  feedback='';
   cursor=Math.min(timeline.length,Math.max(0,next));
   game=new Chess(cursor ? timeline[cursor-1].after : undefined);
   render();
@@ -223,6 +225,7 @@ function render() {
   $('xp').textContent=progress.xp+' XP';
   for (const el of $('nav').querySelectorAll('[data-mode]')) el.setAttribute('aria-pressed',String(el.dataset.mode===mode));
   const isGame=mode==='Jogar', famous=mode==='Partidas', replay=famous||reason;
+  if (mode==='Missões') { missions.open(); return; }
   if (mode==='Progresso') {
     $('app').innerHTML=`<section class="panel"><h1>Seu progresso</h1><p>${progress.done.length} de ${lessons.length} aulas e exercícios concluídos</p><progress max="${lessons.length}" value="${progress.done.length}"></progress><h2>Trilha de estudo</h2>${lessonList(lessons.map((_,i)=>i))}</section>`;
     return;
@@ -254,6 +257,9 @@ function render() {
       <section class="panel"><h2>${mode==='Táticas'?'Problemas':'Trilha de estudo'}</h2>${lessonList(ids)}</section>`;
     if (mode==='Aulas') sidebar+=`<details class="panel"><summary>Referências das aulas</summary><p>Estude os princípios e finais básicos com <a href="https://www.gutenberg.org/ebooks/33870">Chess Fundamentals</a>, de Capablanca. O estudo de partidas lance a lance segue a abordagem de <a href="https://www.batsfordbooks.com/book/logical-chess-move-by-move-2/">Logical Chess</a>, de Irving Chernev.</p></details>`;
   }
+  if (isGame||famous) {
+    sidebar+=`<section class="panel"><h2>Converse com o treinador</h2><div class="controls">${button('inspect','O que observar?',busy||game.isGameOver())}${button('line','Mostre uma linha',busy||game.isGameOver())}</div>${feedback?coach('Análise da posição',feedback):''}</section>`;
+  }
   $('app').innerHTML=`<div class="layout"><section class="board-panel"><div class="board-status">${status}</div>${board()}
     ${promotion.length?`<div class="controls" aria-label="Promoção">${promotion.map(m=>`<button data-promotion="${m.promotion}">${piece[m.promotion]}</button>`).join('')}${button('cancel','Cancelar')}</div>`:''}
     <div class="controls">${controls}</div></section><div class="sidebar">${sidebar}</div></div>`;
@@ -268,6 +274,7 @@ $('nav').onclick=event=>{
 $('app').onclick=event=>{
   const control=event.target.closest('button');
   if (!control||control.disabled) return;
+  if(mode==='Missões'){missions.handle(control);return}
   const {lesson:id,game:classic,ply,square,promotion:promote}=control.dataset;
   if (id!==undefined) { start(mode==='Progresso'?'Aulas':mode,Number(id)); return; }
   if (classic!==undefined) { start('Partidas',Number(classic)); return; }
@@ -275,6 +282,15 @@ $('app').onclick=event=>{
   if (square) { handleSquare(square); return; }
   if (promote) { applyMove(promotion.find(m=>m.promotion===promote)); return; }
   switch(control.id) {
+    case 'inspect':
+    case 'line': {
+      const best=ranked(game)[0];
+      if (!best) break;
+      feedback=control.id==='line'
+        ? 'Uma continuação para comparar é '+best.move.san+(best.reply?' '+best.reply.san:'')+'. '+idea(best.move,game.history().length)
+        : game.isCheck()?'Seu rei está em xeque. Compare as fugas, os bloqueios e as capturas possíveis.':best.move.captured?'Observe '+best.move.to+'. Há uma captura disponível ali. Antes de decidir, conte as recapturas.':'Observe o '+piece[best.move.piece]+' em '+best.move.from+'. Que casas ele alcança e que resposta pode provocar?';
+      render(); break;
+    }
     case 'first': seek(0); break;
     case 'prev': seek(cursor-1); break;
     case 'next': seek(cursor+1); break;
@@ -291,5 +307,6 @@ $('app').onclick=event=>{
       break;
   }
 };
-start();
+const missions=setupMissions($('app'),progress,save,()=>{ $('xp').textContent=progress.xp+' XP'; });
+start('Missões');
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(console.warn);
