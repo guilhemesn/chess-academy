@@ -1,44 +1,295 @@
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1.4.0/+esm';
+import { lessons, games, tactics, notes } from './study.js?v=4';
 
-const lessons=[
-{title:'Controle do centro',level:1,text:'Ocupe o centro com peões para ganhar espaço e abrir linhas.',fen:'start',moves:['e2e4','e7e5','d2d4'],tips:['Avance o peão do rei duas casas.','As pretas disputam o centro.','Ocupe também d4.']},
-{title:'Desenvolva os cavalos',level:1,text:'Desenvolva peças menores para casas ativas antes de iniciar ataques.',fen:'start',moves:['e2e4','e7e5','g1f3','b8c6'],tips:['Abra espaço no centro.','As pretas desenvolvem.','Desenvolva o cavalo e ataque e5.','As pretas defendem o peão.']},
-{title:'Bispo ativo',level:1,text:'Desenvolva o bispo mirando o centro e pontos vulneráveis.',fen:'start',moves:['e2e4','e7e5','f1c4'],tips:['Abra a diagonal do bispo.','As pretas ocupam o centro.','Coloque o bispo em uma diagonal ativa.']},
-{title:'Roque e segurança',level:2,text:'O roque protege o rei e conecta as torres.',fen:'r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 4',moves:['e1g1'],tips:['Faça o roque curto e leve o rei à segurança.']},
-{title:'Garfo de cavalo',level:2,text:'Um garfo cria ameaças simultâneas e pode ganhar material.',fen:'4k3/7r/8/3N4/8/8/8/4K3 w - - 0 1',moves:['d5f6'],tips:['Dê xeque em f6 e ataque a torre de h7.']},
-{title:'Mate em um',level:2,text:'Procure xeques forçados e confirme se o rei tem casas de fuga.',fen:'7k/5Q2/6K1/8/8/8/8/8 w - - 0 1',moves:['f7g7'],tips:['Encontre o mate com a dama protegida pelo rei.']},
-{title:'Promoção',level:2,text:'Um peão que chega à última fileira pode promover e decidir a partida.',fen:'7k/P7/8/8/8/8/8/4K3 w - - 0 1',moves:['a7a8q'],tips:['Promova o peão a dama.']},
-{title:'Peça sem defesa',level:3,text:'Antes de atacar, conte atacantes e defensores. Uma peça sobrecarregada pode não proteger tudo.',fen:'r3k3/8/8/8/8/4q3/4R3/4K3 w - - 0 1',moves:['e2e3'],tips:['Procure uma jogada segura que retire a torre do ataque.']},
-{title:'Ative a torre',level:3,text:'Torres ganham força em colunas abertas e na sétima fileira.',fen:'4k3/8/8/8/8/8/4R3/4K3 w - - 0 1',moves:['e2e7'],tips:['Leve a torre à sétima fileira com xeque.']}
-];
-const games=[
-{title:'A Partida Imortal',players:'Anderssen × Kieseritzky · Londres, 1851',pgn:'1. e4 e5 2. f4 exf4 3. Bc4 Qh4+ 4. Kf1 b5 5. Bxb5 Nf6 6. Nf3 Qh6 7. d3 Nh5 8. Nh4 Qg5 9. Nf5 c6 10. g4 Nf6 11. Rg1 cxb5 12. h4 Qg6 13. h5 Qg5 14. Qf3 Ng8 15. Bxf4 Qf6 16. Nc3 Bc5 17. Nd5 Qxb2 18. Bd6 Bxg1 19. e5 Qxa1+ 20. Ke2 Na6 21. Nxg7+ Kd8 22. Qf6+ Nxf6 23. Be7#',themes:['Desenvolvimento rápido e iniciativa podem compensar material.','A dama e as peças brancas coordenam um ataque ao rei.','O sacrifício final abre caminho para o mate.']},
-{title:'A Partida do Século',players:'Donald Byrne × Bobby Fischer · Nova York, 1956',pgn:'1. Nf3 Nf6 2. c4 g6 3. Nc3 Bg7 4. d4 O-O 5. Bf4 d5 6. Qb3 dxc4 7. Qxc4 c6 8. e4 Nbd7 9. Rd1 Nb6 10. Qc5 Bg4 11. Bg5 Na4 12. Qa3 Nxc3 13. bxc3 Nxe4 14. Bxe7 Qb6 15. Bc4 Nxc3 16. Bc5 Rfe8+ 17. Kf1 Be6 18. Bxb6 Bxc4+ 19. Kg1 Ne2+ 20. Kf1 Nxd4+ 21. Kg1 Ne2+ 22. Kf1 Nc3+ 23. Kg1 axb6 24. Qb4 Ra4 25. Qxb6 Nxd1 26. h3 Rxa2 27. Kh2 Nxf2 28. Re1 Rxe1 29. Qd8+ Bf8 30. Nxe1 Bd5 31. Nf3 Ne4 32. Qb8 b5 33. h4 h5 34. Ne5 Kg7 35. Kg1 Bc5+ 36. Kf1 Ng3+ 37. Ke1 Bb4+ 38. Kd1 Bb3+ 39. Kc1 Ne2+ 40. Kb1 Nc3+ 41. Kc1 Rc2#',themes:['Desenvolver as peças e controlar o centro.','Fischer sacrifica a dama para obter atividade e ataque.','Peças coordenadas podem valer mais que material.']},
-{title:'Opera Game',players:'Paul Morphy × Duque de Brunswick e Conde Isouard · Paris, 1858',pgn:'1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8#',themes:['Desenvolva peças com tempo, atacando alvos.','Abrir linhas para as torres é decisivo.','O desenvolvimento vence a busca prematura por peões.']}
-];
-const $=id=>document.getElementById(id),glyph={k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'},values={p:1,n:3,b:3,r:5,q:9,k:0};
-let saved;try{saved=JSON.parse(localStorage.getItem('academy-v1'))||{done:[],xp:0,errors:{}}}catch{saved={done:[],xp:0,errors:{}}}
-let mode='Aulas',idx=0,game,step=0,selected='',message='',hint=false,finished=false,busy=false,token=0,review=false,commentary='',gameNo=0,gamePly=0;
-function save(){localStorage.setItem('academy-v1',JSON.stringify(saved))}
-function unlocked(l){return l.level===1||saved.xp>=(l.level-1)*100}
-function init(i=0){token++;busy=false;idx=i;game=new Chess();if(mode!=='Jogar'&&mode!=='Partidas'&&lessons[i].fen!=='start')game.load(lessons[i].fen);step=0;selected='';message='';hint=false;finished=false;review=false;commentary='';render()}
-function uci(m){return m.from+m.to+(m.promotion||'')}
-function play(m){game.move(m);selected='';hint=false}
-function award(){if(!saved.done.includes(idx)){saved.done.push(idx);saved.xp+=50;save()}finished=true;message='Excelente! Exercício concluído.'}
-function reply(){while(!finished&&step<lessons[idx].moves.length&&game.turn()==='b'){play({from:lessons[idx].moves[step].slice(0,2),to:lessons[idx].moves[step].slice(2,4),promotion:lessons[idx].moves[step][4]});step++}if(step===lessons[idx].moves.length)award()}
-function explainWrong(m){let p=game.get(m.from),target=game.get(m.to),comments=[];if(target)comments.push(`A captura em ${m.to} troca sua peça ${p.type.toUpperCase()} por ${target.type.toUpperCase()} sem resolver o objetivo.`);if(game.isCheck())comments.push('Seu rei continua em xeque. A prioridade é sair do xeque.');if(m.san.includes('+')&&!m.san.includes('#'))comments.push('O xeque parece ativo, mas o adversário pode responder sem ceder o objetivo.');if(m.piece==='q'&&m.from!=='d1')comments.push('A dama sai cedo e pode virar alvo de peças que ainda estão por desenvolver.');if(m.piece==='n'||m.piece==='b')comments.push('Compare esta casa com uma que desenvolva a peça e também crie uma ameaça útil.');if(!comments.length)comments.push(`A jogada ${m.san} é legal, mas não atende ao tema do exercício. Procure a ideia indicada pela dica e observe as ameaças do adversário.`);return comments.join(' ')}
-function score(){if(game.isCheckmate())return game.turn()==='w'?100000:-100000;if(game.isDraw())return 0;return game.board().flat().reduce((s,p)=>s+(p?(p.color==='b'?1:-1)*values[p.type]:0),0)}
-function bot(){busy=true;render();const t=token;setTimeout(()=>{if(t!==token)return;let best=-Infinity,choice;for(const m of game.moves({verbose:true})){game.move(m);let worst=score();if(!game.isGameOver()){worst=Infinity;for(const r of game.moves({verbose:true})){game.move(r);worst=Math.min(worst,score());game.undo()}}game.undo();if(worst>best){best=worst;choice=m}}if(choice){play(choice);commentary=commentMove(choice,'black');if(game.isGameOver())endGame('Fim de jogo.')}busy=false;render()},100)}
-function commentMove(m,color){let p=game.get(m.from),cap=game.get(m.to),parts=[];if(m.san.includes('#'))parts.push('Mate. Você identificou uma sequência forçada e concluiu a partida.');else if(m.san.includes('+'))parts.push('Xeque. Confira se a peça está protegida e quais respostas o rei ainda tem.');else if(cap)parts.push(`Captura de ${cap.type==='p'?'peão':cap.type}. Antes da troca, confira se sua peça ficará defendida.`);else if(m.piece==='n'||m.piece==='b')parts.push('Bom desenvolvimento de peça menor. Isso amplia suas opções e ajuda a disputar o centro.');else if(m.piece==='p'&&['d','e'].includes(m.to[0]))parts.push('Ocupar o centro dá espaço e abre linhas para suas peças.');else parts.push('Depois desse lance, procure ameaças imediatas e verifique as peças que ficaram sem defesa.');if(m.flags?.includes('k')||m.flags?.includes('q'))parts.push('O roque protege o rei e ativa uma torre.');return (color==='white'?'Seu lance. ':'Lance do computador. ')+parts.join(' ')}
-function endGame(why){token++;busy=false;review=true;finished=true;commentary=why+' Revise a partida: identifique ameaças, peças desprotegidas e oportunidades de desenvolvimento em cada lance.';render()}
-function click(s){if(busy||finished||game.isGameOver()||(mode==='Jogar'&&game.turn()==='b'))return;let p=game.get(s);if(p?.color===game.turn()){selected=s===selected?'':s;render();return}let options=selected?game.moves({square:selected,verbose:true}).filter(m=>m.to===s):[];if(!options.length)return;let m=options[0];if(options.length>1){let q=prompt('Promoção: q=dama, r=torre, b=bispo, n=cavalo','q');m=options.find(x=>x.promotion===q);if(!m)return}if(mode==='Táticas'&&uci(m)!==lessons[idx].moves[step]){play(m);finished=true;message=explainWrong(m);commentary='Leia a explicação e reinicie o problema para tentar outra linha.';render();return}play(m);if(mode==='Jogar'){commentary=commentMove(m,'white');if(game.isGameOver())endGame('Partida encerrada.');else bot()}else{step++;reply();render()}}
-function switchMode(next){mode=next;gameNo=0;init(next==='Táticas'?4:0)}
-function render(){ $('xp').textContent=saved.xp+' XP';$('nav').innerHTML=['Aulas','Táticas','Jogar','Partidas','Progresso'].map(x=>`<button class="${mode===x?'active':''}" data-mode="${x}">${x}</button>`).join('');document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));if(mode==='Progresso'){ $('app').innerHTML=`<div class="panel"><h2>Seu progresso</h2><p>${saved.done.length} de ${lessons.length} aulas concluídas · ${saved.xp} XP</p><progress max="${lessons.length}" value="${saved.done.length}"></progress><h3>Continue aprendendo</h3>${lessons.map((l,i)=>`<button class="lesson" data-lesson="${i}" ${unlocked(l)?'':'disabled'}>${saved.done.includes(i)?'✓':'○'} ${l.title} ${unlocked(l)?'':'· desbloqueia com '+(l.level-1)*100+' XP'}</button>`).join('')}</div>`;bindLessons();return}
-let l=lessons[idx],isGame=mode==='Jogar',isFamous=mode==='Partidas';if(isFamous){let g=games[gameNo];if(!gamePly){game=new Chess();game.loadPgn(g.pgn)} }
-let target=hint&&!isGame&&!isFamous?l.moves[step]:null,legal=selected?game.moves({square:selected,verbose:true}).map(m=>m.to):[],board=game.board().flat().map((p,i)=>{let s='abcdefgh'[i%8]+(8-Math.floor(i/8));return `<button aria-label="${s}" data-square="${s}" class="sq ${(Math.floor(i/8)+i%8)%2?'dark':'light'} ${p?.color==='w'?'white':'black'} ${selected===s||target?.slice(0,2)===s?'selected':''} ${legal.includes(s)||target?.slice(2,4)===s?'target':''}">${p?glyph[p.type]:''}<span class="coord">${i%8===0||i>=56?s:''}</span></button>`}).join('');
-let status=game.isCheckmate()?'Xeque-mate!':game.isDraw()?'Empate':busy?'Computador pensando…':(game.turn()==='w'?'Brancas':'Pretas')+' jogam'+(game.isCheck()?' · Xeque':'');let intro=isFamous?`<small>PARTIDA COMENTADA</small><h2>${games[gameNo].title}</h2><p>${games[gameNo].players}</p>`:isGame?'<small>TREINO LIVRE</small><h2>Partida comentada</h2>':'<small>'+ (mode==='Táticas'?'DESAFIO TÁTICO · AULA ':'AULA ')+(idx+1)+' / '+lessons.length+'</small><h2>'+l.title+'</h2>';
-$('app').innerHTML=`<div class="layout"><section><div class="panel"><small>${status}</small><div class="board">${board}</div><div class="controls"><button id="reset">${mode==='Táticas'&&finished?'Voltar ao início do problema':'Reiniciar'}</button>${isGame?'<button id="undo">Desfazer</button><button class="primary" id="end">Encerrar partida</button>':isFamous?'<button id="prev">Anterior</button><button id="nextMove">Próximo lance</button><button id="nextGame">Próxima partida</button>':'<button id="hint">Dica</button>'}</div><p class="moves muted">${game.history().join(' ')}</p></div></section><section><div class="panel">${intro}<p>${isGame?'Jogue de brancas. O assistente comenta cada lance e prepara uma revisão ao final.':isFamous?games[gameNo].themes[Math.min(2,Math.floor(gamePly/8))]:l.text}</p>${!isGame&&!isFamous?`<progress max="${l.moves.length}" value="${step}"></progress><p>${finished?(mode==='Táticas'?'Problema pausado. Reinicie para tentar de novo.':'✓ Concluído'):hint?l.tips[step]:'Encontre a jogada das brancas. Use a dica se precisar.'}</p>`:''}<p role="status">${message}</p>${commentary?`<div class="coach"><strong>Assistente</strong><p>${commentary}</p></div>`:''}${isGame&&review?`<h3>Revisão da partida</h3><p>${game.history().join(' ')||'Nenhum lance foi realizado.'}</p><button class="primary" id="newGame">Nova partida</button>`:''}${finished&&mode!=='Táticas'&&idx<lessons.length-1?'<button class="primary" id="nextLesson">Próxima aula</button>':''}</div>${mode==='Aulas'||mode==='Táticas'?`<div class="panel"><h2>${mode==='Táticas'?'Problemas':'Trilha progressiva'}</h2>${lessons.map((a,i)=>mode==='Táticas'&&i<3?'':`<button data-lesson="${i}" class="lesson ${idx===i?'active':''}" ${!unlocked(a)?'disabled':''}>${saved.done.includes(i)?'✓':'○'} ${a.title}${!unlocked(a)?' · bloqueada':''}</button>`).join('')}</div>`:''}</section></div>`;
-document.querySelectorAll('[data-square]').forEach(b=>b.onclick=()=>click(b.dataset.square));$('reset').onclick=()=>{if(isFamous){gamePly=0;init(idx);return}init(idx)};if($('hint'))$('hint').onclick=()=>{hint=true;render()};if($('nextLesson'))$('nextLesson').onclick=()=>init(idx+1);if($('end'))$('end').onclick=()=>endGame('Você encerrou a partida.');if($('newGame'))$('newGame').onclick=()=>init(0);if($('undo'))$('undo').onclick=()=>{token++;busy=false;game.undo();if(game.turn()==='b')game.undo();selected='';commentary='Lance desfeito. Reconsidere a posição e procure ameaças e peças sem defesa.';render()};if($('nextMove'))$('nextMove').onclick=()=>stepFamous(1);if($('prev'))$('prev').onclick=()=>stepFamous(-1);if($('nextGame'))$('nextGame').onclick=()=>{gameNo=(gameNo+1)%games.length;gamePly=0;init(0)};bindLessons()}
-function stepFamous(dir){let target=gamePly+dir;if(target<0)return;let g=new Chess();g.loadPgn(games[gameNo].pgn);let all=g.history({verbose:true});if(target>all.length)return;g.reset();for(let i=0;i<target;i++)g.move(all[i]);game=g;gamePly=target;commentary=target?`Lance ${target}: ${games[gameNo].themes[Math.min(2,Math.floor((target-1)/8))]} Reflita sobre as ameaças antes de avançar.`:'Observe o centro, o desenvolvimento e a segurança dos reis. Avance lance a lance e tente prever a ideia.';render()}
-function bindLessons(){document.querySelectorAll('[data-lesson]').forEach(b=>b.onclick=()=>{if(unlocked(lessons[Number(b.dataset.lesson)])){if(mode==='Progresso')mode='Aulas';init(Number(b.dataset.lesson))}})}
-init();if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(console.warn);
+const $ = id => document.getElementById(id);
+const piece = {k:'rei',q:'dama',r:'torre',b:'bispo',n:'cavalo',p:'peão'};
+const glyph = {k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'};
+const value = {k:0,q:900,r:500,b:330,n:320,p:100};
+const uci = m => m.from + m.to + (m.promotion || '');
+const parse = code => ({from:code.slice(0,2),to:code.slice(2,4),promotion:code[4]});
+const label = m => m ? m.san : '';
+const center = ['d4','e4','d5','e5'];
+const openingHome = ['b1','g1','c1','f1','b8','g8','c8','f8'];
+const modes = [['Aulas','◈'],['Táticas','✦'],['Jogar','♞'],['Partidas','▤'],['Progresso','◉']];
+let progress = {done:[],xp:0,errors:{}};
+try {
+  const current = JSON.parse(localStorage.getItem('academy-v4'));
+  const old = JSON.parse(localStorage.getItem('academy-v1'));
+  if (current) progress = current;
+  else if (old) {
+    const legacyIndexes = [0,1,3,4,5,6];
+    const mapIndex = i => old.done?.some(id => id > 5) ? i : (legacyIndexes[i] ?? i);
+    progress = {xp:old.xp || 0,done:(old.done || []).map(mapIndex),errors:Object.fromEntries(Object.entries(old.errors || {}).map(([i, errors])=>[mapIndex(Number(i)),errors]))};
+    save();
+  }
+} catch {}
+
+let mode='Aulas', index=0, step=0, game, selection='', wrong=false, solved=false;
+let hint=false, feedback='', promotion=[], timeline=[], cursor=0, gameIndex=0;
+let busy=false, turnToken=0, reason='', historyNotes=[];
+function save() { try { localStorage.setItem('academy-v4',JSON.stringify(progress)); } catch {} }
+function lesson() { return lessons[index]; }
+function unlocked(i) { return lessons[i].level === 1 || progress.done.includes(i) || progress.xp >= (lessons[i].level-1)*100; }
+function start(next=mode, i=0) {
+  turnToken++;
+  mode=next; index=i; step=0; selection=''; wrong=false; solved=false;
+  hint=false; feedback=''; promotion=[]; timeline=[]; cursor=0; reason=''; historyNotes=[]; busy=false;
+  game=new Chess();
+  if (next==='Partidas') {
+    gameIndex=i;
+    game.loadPgn(games[i].pgn);
+    timeline=game.history({verbose:true});
+    game.reset();
+  }
+  if (['Aulas','Táticas'].includes(next) && lesson().fen!=='start') game.load(lesson().fen);
+  render();
+}
+
+function evaluate(position, color) {
+  if (position.isCheckmate()) return position.turn()===color ? -30000 : 30000;
+  if (position.isDraw()) return 0;
+  let score=0;
+  for (const row of position.board()) for (const p of row) {
+    if (!p) continue;
+    const file='abcdefgh'.indexOf(p.square[0]), rank=Number(p.square[1]);
+    const centrality=7-Math.abs(file-3.5)-Math.abs(rank-4.5);
+    let bonus=0;
+    if (p.type==='n'||p.type==='b') bonus=centrality*7;
+    if (p.type==='p') bonus=centrality*4+(p.color==='w'?rank-2:7-rank)*5;
+    score+=(p.color===color?1:-1)*(value[p.type]+bonus);
+  }
+  return score;
+}
+
+function candidate(position, move) {
+  const color=move.color;
+  position.move(move);
+  try {
+    let score=evaluate(position,color), reply=null;
+    if (!position.isGameOver()) {
+      score=Infinity;
+      for (const response of position.moves({verbose:true})) {
+        position.move(response);
+        const result=evaluate(position,color);
+        position.undo();
+        if (result<score) { score=result; reply=response; }
+      }
+    }
+    return {move, score, reply};
+  } finally {
+    position.undo();
+  }
+}
+
+function ranked(position) {
+  return position.moves({verbose:true}).map(m=>candidate(position,m)).sort((a,b)=>b.score-a.score);
+}
+
+function idea(m, ply) {
+  if (m.san.endsWith('#')) return 'O rei fica sem saída. Confira como as outras peças cobrem as casas de fuga.';
+  if (m.san.startsWith('O-O')) return 'O roque tira o rei do centro e aproxima a torre do jogo.';
+  if (m.promotion) return `O peão chega à última fileira e vira ${piece[m.promotion]}.`;
+  if (m.san.endsWith('+')) return `É xeque. Procure se o rei pode fugir, bloquear ou capturar em ${m.to}.`;
+  if (m.captured) return `O lance captura ${piece[m.captured]} em ${m.to}. Confira se há recaptura e quem se beneficia da troca.`;
+  if (m.piece==='p' && center.includes(m.to)) return `O peão ocupa ${m.to} e disputa espaço no centro.`;
+  if (ply<18 && ['n','b'].includes(m.piece) && openingHome.includes(m.from)) return `O ${piece[m.piece]} sai da posição inicial e entra no jogo por ${m.to}.`;
+  return `O ${piece[m.piece]} vai de ${m.from} a ${m.to}. Compare as casas que controla antes e depois do lance.`;
+}
+
+function assess(position, move) {
+  const choices=ranked(position);
+  const best=choices[0], played=choices.find(item=>uci(item.move)===uci(move));
+  const gap=best.score-played.score;
+  const grade=gap>=150?'Lance ruim':gap>=40?'Pode melhorar':'Bom lance';
+  let text=idea(move,position.history().length);
+  if (gap>=40) {
+    if (played.reply?.san.endsWith('#')) text+=` A resposta ${label(played.reply)} dá mate.`;
+    else if (played.reply?.captured) text+=` A resposta ${label(played.reply)} pode capturar ${piece[played.reply.captured]}.`;
+    text+=` Compare com ${label(best.move)}, que deixa uma posição melhor na análise das respostas imediatas.`;
+  }
+  return {grade,text};
+}
+
+function explainWrong(move, expected) {
+  const goal=lesson().tips[step] || lesson().text;
+  const played=candidate(game,move);
+  const expectedMove=game.moves({verbose:true}).find(m=>uci(m)===expected);
+  const intended=candidate(game,expectedMove);
+  let explanation=`${label(move)} leva o ${piece[move.piece]} a ${move.to}. `;
+  if (played.reply?.san.endsWith('#')) explanation+=`As pretas podem dar mate com ${label(played.reply)}. `;
+  else if (played.reply?.captured && intended.score-played.score>=90) explanation+=`As pretas podem responder ${label(played.reply)} e tomar ${piece[played.reply.captured]}. `;
+  else if (index===4) explanation+='O cavalo precisa ameaçar ao mesmo tempo o rei em e8 e a torre em h7. ';
+  else if ([5,16].includes(index)) explanation+='O rei adversário ainda não recebeu mate. ';
+  else if (index===7) explanation+='A dama preta em e3 continua sem ser capturada. ';
+  return explanation+goal;
+}
+
+function exercise(move) {
+  const expected=lesson().moves[step];
+  if (uci(move)!==expected && !([5,16].includes(index) && move.san.endsWith('#'))) {
+    feedback=explainWrong(move,expected);
+    progress.errors[index]=(progress.errors[index]||0)+1; save();
+    if (mode==='Táticas') { game.move(move); wrong=true; }
+    return;
+  }
+  game.move(move);
+  feedback=idea(move,step);
+  step++;
+  while (game.turn()==='b' && step<lesson().moves.length) game.move(parse(lesson().moves[step++]));
+  if (step===lesson().moves.length) {
+    solved=true;
+    if (!progress.done.includes(index)) { progress.done.push(index); progress.xp+=50; save(); }
+  }
+}
+
+function finish(message) {
+  turnToken++; busy=false; selection=''; promotion=[]; reason=message;
+  timeline=game.history({verbose:true}); cursor=timeline.length;
+  render();
+}
+
+function naturalEnd() {
+  finish(game.isCheckmate()?(game.turn()==='b'?'Você venceu por xeque-mate.':'O computador venceu por xeque-mate.'):'A partida terminou empatada.');
+}
+
+function playTraining(move) {
+  historyNotes.push(assess(game,move));
+  game.move(move);
+  if (game.isGameOver()) { naturalEnd(); return; }
+  busy=true;
+  const token=++turnToken;
+  setTimeout(()=>{
+    if (token!==turnToken) return;
+    const choices=ranked(game);
+    const best=choices[0];
+    const options=choices.filter(c=>c.score>=best.score-35);
+    const response=options[Math.floor(Math.random()*options.length)].move;
+    historyNotes.push({grade:'Computador',text:idea(response,game.history().length)});
+    game.move(response); busy=false;
+    if (game.isGameOver()) naturalEnd(); else render();
+  },140);
+}
+
+function canMove() {
+  return !busy&&!wrong&&!solved&&!reason&&mode!=='Partidas'&&!game.isGameOver()&&!promotion.length;
+}
+
+function handleSquare(square) {
+  if (!canMove()) return;
+  if (game.get(square)?.color===game.turn()) selection=selection===square?'':square;
+  else if (selection) {
+    const moves=game.moves({square:selection,verbose:true}).filter(m=>m.to===square);
+    if (moves.length>1) promotion=moves;
+    else if (moves.length) { applyMove(moves[0]); return; }
+  }
+  render();
+}
+
+function applyMove(move) {
+  selection=''; hint=false; promotion=[]; feedback='';
+  if (mode==='Jogar') playTraining(move); else exercise(move);
+  render();
+}
+
+function seek(next) {
+  cursor=Math.min(timeline.length,Math.max(0,next));
+  game=new Chess(cursor ? timeline[cursor-1].after : undefined);
+  render();
+}
+
+function button(id,text,disabled=false,primary=false) {
+  return `<button id="${id}" ${disabled?'disabled':''} ${primary?'class="primary"':''}>${text}</button>`;
+}
+function coach(title,text) {
+  return `<div class="coach" role="status"><div class="coach-top"><span class="avatar" aria-hidden="true">♞</span><span>Assistente<strong>${title}</strong></span></div><p>${text}</p></div>`;
+}
+function lessonList(ids) {
+  return ids.map(i=>`<button class="item ${i===index&&mode!=='Progresso'?'current':''}" data-lesson="${i}" ${mode!=='Táticas'&&!unlocked(i)?'disabled':''}><span>${progress.done.includes(i)?'✓':'○'} &nbsp;${lessons[i].title}</span><small>${mode!=='Táticas'&&!unlocked(i)?(lessons[i].level-1)*100+' XP':'Nível '+lessons[i].level}</small></button>`).join('');
+}
+
+function board() {
+  const last=(mode==='Partidas'||reason)?timeline[cursor-1]:game.history({verbose:true}).at(-1);
+  const target=hint?lesson().moves[step]:null;
+  const legal=selection?game.moves({square:selection,verbose:true}).map(m=>m.to):[];
+  return `<div class="board" aria-label="Tabuleiro">${game.board().flat().map((p,i)=>{
+    const square='abcdefgh'[i%8]+(8-Math.floor(i/8));
+    const dark=(Math.floor(i/8)+i%8)%2;
+    const marked=[last?.from,last?.to,target?.slice(0,2),target?.slice(2,4),selection].includes(square);
+    return `<button aria-label="${square}${p?' · '+piece[p.type]+' '+(p.color==='w'?'brancas':'pretas'):''}" data-square="${square}" ${canMove()?'':'aria-disabled="true"'} class="sq ${dark?'dark':'light'} ${p?.color==='w'?'white':'black'} ${marked?'marked':''} ${wrong&&last?.to===square?'wrong':''} ${legal.includes(square)?'target':''}">${p?glyph[p.type]:''}<span>${i%8===0||i>=56?square:''}</span></button>`;
+  }).join('')}</div>`;
+}
+
+function render() {
+  $('xp').textContent=progress.xp+' XP';
+  for (const el of $('nav').querySelectorAll('[data-mode]')) el.setAttribute('aria-pressed',String(el.dataset.mode===mode));
+  const isGame=mode==='Jogar', famous=mode==='Partidas', replay=famous||reason;
+  if (mode==='Progresso') {
+    $('app').innerHTML=`<section class="panel"><h1>Seu progresso</h1><p>${progress.done.length} de ${lessons.length} aulas e exercícios concluídos</p><progress max="${lessons.length}" value="${progress.done.length}"></progress><h2>Trilha de estudo</h2>${lessonList(lessons.map((_,i)=>i))}</section>`;
+    return;
+  }
+  const status=wrong?'Tentativa incorreta':replay?`Lance ${cursor} de ${timeline.length}`:busy?'Computador pensando…':game.isCheckmate()?'Xeque-mate':(game.turn()==='w'?'Brancas':'Pretas')+' jogam'+(game.isCheck()?' · Xeque':'');
+  let sidebar, controls;
+  if (replay) {
+    controls=button('first','Início',cursor===0)+button('prev','Anterior',cursor===0)+button('next','Próximo lance',cursor===timeline.length);
+    const move=timeline[cursor-1], record=historyNotes[cursor-1];
+    const title=famous?games[gameIndex].title:'Revisão da partida';
+    const overview=famous?games[gameIndex].players:reason;
+    sidebar=`<section class="panel"><h1>${title}</h1><p class="muted">${overview}</p>
+      ${coach(move?(record?record.grade+' · ':'')+label(move):'Posição inicial',move?(record?.text||notes[gameIndex]?.[cursor]||idea(move,cursor-1)):(timeline.length?'Avance um lance de cada vez. Antes de avançar, tente prever o que o jogador ameaça.':'A partida foi encerrada antes do primeiro lance.'))}
+      <div class="move-list" aria-label="Histórico de lances">${timeline.map((m,i)=>`<button data-ply="${i+1}" aria-pressed="${cursor===i+1}">${i%2===0?(Math.floor(i/2)+1)+'. ':''}${label(m)}</button>`).join('')}</div>
+      ${reason?button('new','Nova partida',false,true):''}</section>`;
+    if (famous) sidebar+=`<section class="panel"><h2>Partidas clássicas</h2>${games.map((g,i)=>`<button class="item ${i===gameIndex?'current':''}" data-game="${i}">${g.title}</button>`).join('')}</section>`;
+  } else if (isGame) {
+    controls=button('undo','Desfazer',!historyNotes.length)+button('end','Encerrar partida',false,true);
+    const yourMove=historyNotes.at(historyNotes.length%2?-1:-2);
+    const reply=historyNotes.length%2?null:historyNotes.at(-1);
+    sidebar=`<section class="panel"><h1>Partida comentada</h1><p class="muted">Você joga de brancas. O assistente avalia as respostas imediatas antes de sugerir alternativas.</p>${coach(yourMove?.grade||'Antes do primeiro lance',yourMove?.text||'Procure ocupar o centro, desenvolver as peças menores e preparar o roque.')}${reply?`<p class="muted">${reply.text}</p>`:''}</section>`;
+  } else {
+    const ids=mode==='Táticas'?tactics:lessons.map((_,i)=>i);
+    const next=ids.slice(ids.indexOf(index)+1).find(i=>mode==='Táticas'||unlocked(i));
+    controls=button('reset',wrong?'Voltar ao início do problema':'Reiniciar',false,wrong)+button('hint','Dica',wrong||solved);
+    sidebar=`<section class="panel"><small>${mode==='Táticas'?'Tática':'Aula'} · Nível ${lesson().level}</small><h1>${lesson().title}</h1>
+      ${coach(wrong?'Por que o lance falhou':solved?'Exercício concluído':hint?'Dica':feedback?'Seu último lance':'O que observar',feedback|| (hint?lesson().tips[step]:lesson().text))}
+      <progress max="${lesson().moves.length}" value="${step}"></progress>${solved&&next!==undefined?`<button class="primary" data-lesson="${next}">Continuar</button>`:''}</section>
+      <section class="panel"><h2>${mode==='Táticas'?'Problemas':'Trilha de estudo'}</h2>${lessonList(ids)}</section>`;
+    if (mode==='Aulas') sidebar+=`<details class="panel"><summary>Referências das aulas</summary><p>Estude os princípios e finais básicos com <a href="https://www.gutenberg.org/ebooks/33870">Chess Fundamentals</a>, de Capablanca. O estudo de partidas lance a lance segue a abordagem de <a href="https://www.batsfordbooks.com/book/logical-chess-move-by-move-2/">Logical Chess</a>, de Irving Chernev.</p></details>`;
+  }
+  $('app').innerHTML=`<div class="layout"><section class="board-panel"><div class="board-status">${status}</div>${board()}
+    ${promotion.length?`<div class="controls" aria-label="Promoção">${promotion.map(m=>`<button data-promotion="${m.promotion}">${piece[m.promotion]}</button>`).join('')}${button('cancel','Cancelar')}</div>`:''}
+    <div class="controls">${controls}</div></section><div class="sidebar">${sidebar}</div></div>`;
+}
+
+$('nav').innerHTML=modes.map(([name,icon])=>`<button data-mode="${name}"><span aria-hidden="true">${icon}</span>${name}</button>`).join('');
+$('nav').onclick=event=>{
+  const next=event.target.closest('button')?.dataset.mode;
+  if (!next||next===mode) return;
+  start(next,next==='Táticas'?tactics[0]:0);
+};
+$('app').onclick=event=>{
+  const control=event.target.closest('button');
+  if (!control||control.disabled) return;
+  const {lesson:id,game:classic,ply,square,promotion:promote}=control.dataset;
+  if (id!==undefined) { start(mode==='Progresso'?'Aulas':mode,Number(id)); return; }
+  if (classic!==undefined) { start('Partidas',Number(classic)); return; }
+  if (ply!==undefined) { seek(Number(ply)); return; }
+  if (square) { handleSquare(square); return; }
+  if (promote) { applyMove(promotion.find(m=>m.promotion===promote)); return; }
+  switch(control.id) {
+    case 'first': seek(0); break;
+    case 'prev': seek(cursor-1); break;
+    case 'next': seek(cursor+1); break;
+    case 'reset': start(mode,index); break;
+    case 'new': start('Jogar'); break;
+    case 'hint': hint=true; feedback=''; render(); break;
+    case 'end': finish('Você encerrou a partida.'); break;
+    case 'cancel': promotion=[]; render(); break;
+    case 'undo':
+      turnToken++; busy=false; promotion=[]; selection='';
+      game.undo(); historyNotes.pop();
+      if (game.turn()==='b') { game.undo(); historyNotes.pop(); }
+      render();
+      break;
+  }
+};
+start();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(console.warn);
